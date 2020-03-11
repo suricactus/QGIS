@@ -25,6 +25,7 @@
 #include "qgsgui.h"
 #include "qgsvectorlayerjoinbuffer.h"
 #include "qgsvectorlayerutils.h"
+#include "qgslogger.h"
 
 #include <QLayout>
 #include <QLabel>
@@ -169,6 +170,7 @@ QVariant QgsAttributeFormEditorWidget::currentValue() const
 
 void QgsAttributeFormEditorWidget::editorWidgetValuesChanged( const QVariant &value, const QVariantList &additionalFieldValues )
 {
+  QgsLogger::warning( "VALUE CHANGED" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
   if ( mBlockValueUpdate )
     return;
 

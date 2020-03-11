@@ -64,6 +64,7 @@ QVariant QgsTextEditWrapper::value() const
                           || field().type() == QVariant::Date ) )
        || v == QgsApplication::nullRepresentation() )
   {
+    QgsLogger::warning( "::value" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
     return QVariant( field().type() );
   }
 
@@ -281,10 +282,15 @@ void QgsTextEditWrapper::textChanged( const QString & )
 void QgsTextEditWrapper::setWidgetValue( const QVariant &val )
 {
   QString v;
+  bool isNull = false;
+  QgsLogger::warning( "setWidgetValue" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
   if ( val.isNull() )
   {
     if ( !( field().type() == QVariant::Int || field().type() == QVariant::Double || field().type() == QVariant::LongLong || field().type() == QVariant::Date ) )
+    {
       v = QgsApplication::nullRepresentation();
+      isNull = true;
+    }
   }
   else if ( field().type() == QVariant::Map )
   {
@@ -309,6 +315,7 @@ void QgsTextEditWrapper::setWidgetValue( const QVariant &val )
   else if ( val.type() == QVariant::Double && std::isnan( val.toDouble() ) )
   {
     v = QgsApplication::nullRepresentation();
+    isNull = true;
   }
   else
   {
@@ -337,6 +344,7 @@ void QgsTextEditWrapper::setWidgetValue( const QVariant &val )
   {
     if ( mTextEdit )
     {
+      QgsLogger::warning( "EDD1" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
       if ( config( QStringLiteral( "UseHtml" ) ).toBool() )
       {
         mTextEdit->setHtml( v );
@@ -350,14 +358,46 @@ void QgsTextEditWrapper::setWidgetValue( const QVariant &val )
       {
         mTextEdit->setPlainText( v );
       }
+
+      if ( isNull )
+      {
+        mTextEdit->setFont( *QgsApplication::nullRepresentationFont() );
+        mTextEdit->setPalette( *QgsApplication::nullRepresentationPalette() );
+      }
     }
     else if ( mPlainTextEdit )
     {
+      QgsLogger::warning( "EDD2" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
       mPlainTextEdit->setPlainText( v );
+
+      if ( isNull )
+      {
+        mPlainTextEdit->setFont( *QgsApplication::nullRepresentationFont() );
+        mPlainTextEdit->setPalette( *QgsApplication::nullRepresentationPalette() );
+      }
+      else
+      {
+        
+      }
     }
     else if ( mLineEdit )
     {
       mLineEdit->setText( v );
+
+      if ( isNull )
+      {
+        QgsLogger::warning( "IF" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
+        mLineEdit->setFont( *QgsApplication::nullRepresentationFont() );
+        mLineEdit->setPalette( *QgsApplication::nullRepresentationPalette() );
+        QgsLogger::warning( mLineEdit->palette().color( QPalette::Text ).name() + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
+      }
+      else
+      {
+        QgsLogger::warning( "ELSE" + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
+        mLineEdit->setFont( QFont() );
+        mLineEdit->setPalette( QPalette() );
+        QgsLogger::warning( mLineEdit->palette().color( QPalette::Text ).name() + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
+      }
     }
   }
 }

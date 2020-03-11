@@ -1511,6 +1511,7 @@ void QgsAttributeForm::init()
       i->setFixedSize( 18, 18 );
 
       QgsEditorWidgetWrapper *eww = QgsGui::editorWidgetRegistry()->create( widgetSetup.type(), mLayer, idx, widgetSetup.config(), nullptr, this, mContext );
+      QgsLogger::warning( fieldName + widgetSetup.type() + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
 
       QWidget *w = nullptr;
       if ( eww )

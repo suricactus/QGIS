@@ -19,6 +19,8 @@
 #include <QApplication>
 #include <QEvent>
 #include <QStringList>
+#include <QFont>
+#include <QPalette>
 
 #include "qgis_sip.h"
 #include "qgsconfig.h"
@@ -784,6 +786,10 @@ class CORE_EXPORT QgsApplication : public QApplication
      */
     static QString nullRepresentation();
 
+    static QFont *nullRepresentationFont();
+
+    static QPalette *nullRepresentationPalette();
+    
     /**
      * \copydoc nullRepresentation()
      */
@@ -923,6 +929,8 @@ class CORE_EXPORT QgsApplication : public QApplication
       QgsBookmarkManager *mBookmarkManager = nullptr;
       QgsStyleModel *mStyleModel = nullptr;
       QString mNullRepresentation;
+      QFont *mNullRepresentationFont = nullptr;
+      QPalette *mNullRepresentationPalette = nullptr;
 
       ApplicationMembers();
       ~ApplicationMembers();

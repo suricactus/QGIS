@@ -78,6 +78,8 @@
 #include <QThreadPool>
 #include <QLocale>
 #include <QStyle>
+#include <QFont>
+#include <QPalette>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -1791,6 +1793,23 @@ QString QgsApplication::nullRepresentation()
   return appMembers->mNullRepresentation;
 }
 
+QFont *QgsApplication::nullRepresentationFont()
+{
+  ApplicationMembers *appMembers = members();
+  if ( ! appMembers->mNullRepresentationFont )
+  {
+    appMembers->mNullRepresentationFont = new QFont();
+    appMembers->mNullRepresentationFont->setItalic(true);
+    appMembers->mNullRepresentationFont->setBold(true);
+  }
+  return appMembers->mNullRepresentationFont;
+}
+
+QPalette *QgsApplication::nullRepresentationPalette()
+{
+  return members()->mNullRepresentationPalette;
+}
+
 void QgsApplication::setNullRepresentation( const QString &nullRepresentation )
 {
   ApplicationMembers *appMembers = members();
@@ -2239,6 +2258,10 @@ QgsApplication::ApplicationMembers::ApplicationMembers()
   mValidityCheckRegistry = new QgsValidityCheckRegistry();
   mClassificationMethodRegistry = new QgsClassificationMethodRegistry();
   mBookmarkManager = new QgsBookmarkManager( nullptr );
+  mNullRepresentationPalette = new QPalette();
+  mNullRepresentationPalette->setColor( QPalette::Text, QColor( "green" ) );
+  mNullRepresentationPalette->setColor( QPalette::WindowText, QColor( "green" ) );
+  mNullRepresentationPalette->setColor( QPalette::Foreground, QColor( "green" ) );
 }
 
 QgsApplication::ApplicationMembers::~ApplicationMembers()
@@ -2270,6 +2293,7 @@ QgsApplication::ApplicationMembers::~ApplicationMembers()
   delete mClassificationMethodRegistry;
   delete mNumericFormatRegistry;
   delete mBookmarkManager;
+  delete mNullRepresentationPalette;
 }
 
 QgsApplication::ApplicationMembers *QgsApplication::members()

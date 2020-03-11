@@ -636,7 +636,18 @@ void QgsIdentifyResultsDialog::addFeature( QgsVectorLayer *vlayer, const QgsFeat
     }
     else
     {
-      attrItem->setData( 1, Qt::DisplayRole, value );
+      if ( attrs.at( i ).isNull() )
+      {
+        // myOpt.palette.setColor( QColor( "pink" ) );
+        attrItem->setData( 1, Qt::DisplayRole, value );
+        attrItem->setFont( 1, *QgsApplication::nullRepresentationFont() );
+        attrItem->setForeground( 1, QgsApplication::nullRepresentationPalette()->brush( QPalette::Normal, QPalette::Foreground ) );
+      }
+      else
+      {
+        attrItem->setData( 1, Qt::DisplayRole, value );
+      }
+
       attrItem->treeWidget()->setItemWidget( attrItem, 1, nullptr );
     }
 

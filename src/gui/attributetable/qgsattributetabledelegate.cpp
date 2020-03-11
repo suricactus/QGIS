@@ -32,6 +32,7 @@
 #include "qgsgui.h"
 #include "qgsvectorlayerjoininfo.h"
 #include "qgsvectorlayerjoinbuffer.h"
+#include "qgsapplication.h"
 
 QgsVectorLayer *QgsAttributeTableDelegate::layer( const QAbstractItemModel *model )
 {
@@ -189,8 +190,10 @@ void QgsAttributeTableDelegate::paint( QPainter *painter, const QStyleOptionView
 
     if ( index.model()->data( index, Qt::EditRole ).isNull() )
     {
-      myOpt.font.setItalic( true );
-      myOpt.palette.setColor( QPalette::Text, QColor( "gray" ) );
+      myOpt.font = *QgsApplication::nullRepresentationFont();
+      myOpt.palette = *QgsApplication::nullRepresentationPalette();
+
+      QgsLogger::warning( myOpt.palette.color( QPalette::Text ).name() + QStringLiteral( __FILE__ ) + ": " + QString::number( __LINE__ ) );
     }
 
     if ( mFeatureSelectionModel && mFeatureSelectionModel->isSelected( fid ) )
