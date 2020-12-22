@@ -130,6 +130,16 @@ Discover all the relations available from the current layers.
 .. versionadded:: 3.0
 %End
 
+    QMap<QString, QList<QgsRelation>> dynamicRelations() const;
+%Docstring
+Returns all the dynamic relations
+%End
+
+    QList<QgsRelation> relationsInDynamicRelation( QString dynamicRelationId ) const;
+%Docstring
+Returns the list of relations associated to a dynamic relation
+%End
+
   signals:
     void relationsLoaded();
 %Docstring

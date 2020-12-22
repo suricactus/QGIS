@@ -138,6 +138,16 @@ class CORE_EXPORT QgsRelationManager : public QObject
      */
     static QList<QgsRelation> discoverRelations( const QList<QgsRelation> &existingRelations, const QList<QgsVectorLayer *> &layers );
 
+    /**
+     * Returns all the dynamic relations
+     */
+    QMap<QString, QList<QgsRelation>> dynamicRelations() const;
+
+    /**
+     * Returns the list of relations associated to a dynamic relation
+     */
+    QList<QgsRelation> relationsInDynamicRelation( QString dynamicRelationId ) const;
+
   signals:
     //! Emitted when the relations were loaded after reading a project
     void relationsLoaded();

@@ -28,6 +28,12 @@ class QgsRelation
       Composition
     };
 
+    enum RelationType
+    {
+      Normal,
+      Dynamic,
+    };
+
 
     QgsRelation();
 %Docstring
@@ -314,6 +320,34 @@ Will be called internally whenever a member is changed.
 
 .. versionadded:: 3.6
 %End
+
+    void setReferencedLayerExpression( const QString &expression );
+%Docstring
+Sets the ``expression`` which allows to retrieve the parent layer
+
+.. versionadded:: 3.18
+%End
+
+    QString referencedLayerExpression() const;
+%Docstring
+Returns the expression which allows to retrieve the parent layer
+
+.. versionadded:: 3.18
+%End
+
+
+    QgsExpressionContext getLayerContext() const;
+%Docstring
+Provide layer metadata as variables in an expression context
+
+.. versionadded:: 3.18
+%End
+
+
+    void setChildRelationIds( const QStringList &childRelationIds );
+    QStringList childRelationIds() const;
+    void setType( RelationType relationType );
+    RelationType type() const;
 
 };
 

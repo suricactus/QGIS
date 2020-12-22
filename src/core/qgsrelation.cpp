@@ -400,3 +400,41 @@ void QgsRelation::updateRelationStatus()
 
   }
 }
+
+void QgsRelation::setReferencedLayerExpression( const QString &expression )
+{
+  d.detach();
+  d->mReferencedLayerExpression = expression;
+}
+
+QString QgsRelation::referencedLayerExpression() const
+{
+  return d->mReferencedLayerExpression;
+}
+
+QgsExpressionContext QgsRelation::getLayerContext() const
+{
+  return QgsExpressionContext();
+}
+
+void QgsRelation::setChildRelationIds( const QStringList &childRelationIds )
+{
+  d.detach();
+  d->mChildRelationIds = childRelationIds;
+}
+
+QStringList QgsRelation::childRelationIds() const
+{
+  return d->mChildRelationIds;
+}
+
+void QgsRelation::setType( RelationType relationType )
+{
+  d.detach();
+  d->mRelationType = relationType;
+}
+
+QgsRelation::RelationType QgsRelation::type() const
+{
+  return d->mRelationType;
+}

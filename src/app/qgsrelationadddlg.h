@@ -17,6 +17,7 @@
 
 #include <QDialog>
 #include "qgis_app.h"
+#include "ui_qgsrelationmanageradddialogbase.h"
 #include "qgsrelation.h"
 
 class QDialogButtonBox;
@@ -72,7 +73,7 @@ class APP_EXPORT QgsFieldPairWidget : public QWidget
  * QgsRelationAddDlg allows configuring a new relation.
  * Multiple field pairs can be set.
  */
-class APP_EXPORT QgsRelationAddDlg : public QDialog
+class APP_EXPORT QgsRelationAddDlg : public QDialog, private Ui::QgsRelationManagerAddDialogBase
 {
     Q_OBJECT
 
@@ -85,20 +86,31 @@ class APP_EXPORT QgsRelationAddDlg : public QDialog
     QString relationId();
     QString relationName();
     QgsRelation::RelationStrength relationStrength();
+    QgsRelation::RelationType type();
 
   private slots:
-    void checkDefinitionValid();
-    void fieldPairRemoved( QgsFieldPairWidget *fieldPairWidget );
-    void addFieldPairWidget();
+    void addFieldsRow();
+    void removeFieldsRow();
+    void updateTypeConfigWidget();
+    void updateFieldsMappingButtons();
+    void updateFieldsMappingHeaders();
+    void updateDialogButtons();
+    void updateChildRelationsComboBox();
+    void updateReferencedFieldsComboBoxes();
+    void updateReferencingFieldsComboBoxes();
 
   private:
-    QList<QgsFieldPairWidget *> mFieldPairWidgets;
+    bool isDefinitionValid();
+    void updateFieldsMapping();
+//    QList<QgsFieldPairWidget *> mFieldPairWidgets;
 
-    QDialogButtonBox *mButtonBox = nullptr;
-    QVBoxLayout *mFieldPairsLayout = nullptr;
-    QLineEdit *mNameLineEdit = nullptr;
-    QLineEdit *mIdLineEdit = nullptr;
-    QComboBox *mStrengthCombobox = nullptr;
+//    QDialogButtonBox *mButtonBox = nullptr;
+//    QVBoxLayout *mFieldPairsLayout = nullptr;
+//    QLineEdit *mNameLineEdit = nullptr;
+//    QComboBox *mTypeComboBox = nullptr;
+//    QLineEdit *mIdLineEdit = nullptr;
+//    QLineEdit *mReferencedLayerExpressionLineEdit = nullptr;
+//    QComboBox *mStrengthCombobox = nullptr;
     QgsMapLayerComboBox *mReferencedLayerCombobox = nullptr;
     QgsMapLayerComboBox *mReferencingLayerCombobox = nullptr;
 

@@ -30,6 +30,8 @@
 #include "qgsmaplayerproxymodel.h"
 #include "qgsapplication.h"
 #include "qgshelp.h"
+#include "qgsproject.h"
+#include "qgsrelationmanager.h"
 
 
 
@@ -44,13 +46,13 @@ QgsFieldPairWidget::QgsFieldPairWidget( int index, QWidget *parent )
   mAddButton = new QToolButton( this );
   mAddButton->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/symbologyAdd.svg" ) ) );
   mAddButton->setMinimumWidth( 30 );
-  mAddButton->setToolTip( tr( "Add new field pair as part of a composite foreign key" ) );
+  mAddButton->setToolTip( "Add new field pair as part of a composite foreign key" );
   mLayout->addWidget( mAddButton, 0, Qt::AlignLeft );
 
   mRemoveButton = new QToolButton( this );
   mRemoveButton->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/symbologyRemove.svg" ) ) );
   mRemoveButton->setMinimumWidth( 30 );
-  mRemoveButton->setToolTip( tr( "Remove the last pair of fields" ) );
+  mRemoveButton->setToolTip( "Remove the last pair of fields" );
   mLayout->addWidget( mRemoveButton, 0, Qt::AlignLeft );
 
   mSpacerItem = new QSpacerItem( 30, 30, QSizePolicy::Minimum, QSizePolicy::Maximum );
@@ -122,64 +124,25 @@ void QgsFieldPairWidget::changeEnable()
 
 QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
   : QDialog( parent )
+  , Ui::QgsRelationManagerAddDialogBase()
 {
-  setWindowTitle( tr( "Add New Relation" ) );
-  QGridLayout *layout = new QGridLayout(); // column 0 is kept free for alignment purpose
+  setupUi( this );
+  setWindowTitle( "Add New Relation" );
 
-  // row 0: name
-  // col 1
-  QLabel *nameLabel = new QLabel( tr( "Name" ), this );
-  layout->addWidget( nameLabel, 0, 1 );
-  // col 2
-  mNameLineEdit = new QLineEdit( this );
-  layout->addWidget( mNameLineEdit, 0, 2 );
-
-  // row 1: labels
-  // col 1
-  QLabel *referencedLabel = new QLabel( tr( "Referenced layer (parent)" ), this );
-  layout->addWidget( referencedLabel, 1, 1 );
-  // col 2
-  QLabel *referencingLabel = new QLabel( tr( "Referencing layer (child)" ), this );
-  layout->addWidget( referencingLabel, 1, 2 );
-
-  // row 2: layer comboboxes
-  // col 1
   mReferencedLayerCombobox = new QgsMapLayerComboBox( this );
   mReferencedLayerCombobox->setFilters( QgsMapLayerProxyModel::VectorLayer );
-  layout->addWidget( mReferencedLayerCombobox, 2, 1 );
-  // col 2
+  mFieldsMappingTable->setCellWidget( 0, 0, mReferencedLayerCombobox );
+
   mReferencingLayerCombobox = new QgsMapLayerComboBox( this );
   mReferencingLayerCombobox->setFilters( QgsMapLayerProxyModel::VectorLayer );
-  layout->addWidget( mReferencingLayerCombobox, 2, 2 );
+  mFieldsMappingTable->setCellWidget( 0, 1, mReferencingLayerCombobox );
 
-  // row 3: field pairs layout
-  mFieldPairsLayout = new QVBoxLayout();
-  layout->addLayout( mFieldPairsLayout, 3, 0, 1, 3 );
+  mRelationStrengthComboBox->addItem( "Association", QVariant::fromValue( QgsRelation::RelationStrength::Association ) );
+  mRelationStrengthComboBox->addItem( "Composition", QVariant::fromValue( QgsRelation::RelationStrength::Composition ) );
+  mRelationStrengthComboBox->setToolTip( QStringLiteral( "On composition, the child features will be duplicated too.\n"
+                                         "Duplications are made by the feature duplication action.\n"
+                                         "The default actions are activated in the Action section of the layer properties." ) );
 
-  // row 4: id
-  // row 1
-  QLabel *idLabel = new QLabel( tr( "Id" ), this );
-  layout->addWidget( idLabel, 4, 1 );
-  // col 2
-  mIdLineEdit = new QLineEdit( this );
-  mIdLineEdit->setPlaceholderText( tr( "[Generated automatically]" ) );
-  layout->addWidget( mIdLineEdit, 4, 2 );
-
-  // row 5: strength
-  QLabel *strengthLabel = new QLabel( tr( "Relationship strength" ), this );
-  layout->addWidget( strengthLabel, 5, 1 );
-  // col 2
-  mStrengthCombobox = new QComboBox( this );
-  mStrengthCombobox->addItem( tr( "Association" ), QVariant::fromValue( QgsRelation::RelationStrength::Association ) );
-  mStrengthCombobox->addItem( tr( "Composition" ), QVariant::fromValue( QgsRelation::RelationStrength::Composition ) );
-  mStrengthCombobox->setToolTip( tr( "When composition is selected the child features will be duplicated too.\n"
-                                     "Duplications are made by the feature duplication action.\n"
-                                     "The default actions are activated in the Action section of the layer properties." ) );
-  layout->addWidget( mStrengthCombobox, 5, 2 );
-
-  // row 6: button box
-  mButtonBox = new QDialogButtonBox( this );
-  mButtonBox->setOrientation( Qt::Horizontal );
   mButtonBox->setStandardButtons( QDialogButtonBox::Cancel | QDialogButtonBox::Help | QDialogButtonBox::Ok );
   connect( mButtonBox, &QDialogButtonBox::accepted, this, &QgsRelationAddDlg::accept );
   connect( mButtonBox, &QDialogButtonBox::rejected, this, &QgsRelationAddDlg::reject );
@@ -187,49 +150,110 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
   {
     QgsHelp::openHelp( QStringLiteral( "working_with_vector/attribute_table.html#defining-1-n-relations" ) );
   } );
-  layout->addWidget( mButtonBox, 7, 1, 1, 2 );
 
-  // set layout
-  layout->setColumnMinimumWidth( 0, 30 );
-  layout->setColumnStretch( 1, 1 );
-  layout->setColumnStretch( 2, 1 );
-  layout->setRowStretch( 6, 2 );
-  setLayout( layout );
 
-  addFieldPairWidget();
-  addFieldPairWidget();
+  addFieldsRow();
+  updateTypeConfigWidget();
+  updateDialogButtons();
 
-  checkDefinitionValid();
-
-  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::checkDefinitionValid );
-  connect( mReferencedLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::checkDefinitionValid );
+  connect( mNormalTypeRadioButton, &QRadioButton::clicked, this, &QgsRelationAddDlg::updateTypeConfigWidget );
+  connect( mDynamicTypeRadioButton, &QRadioButton::clicked, this, &QgsRelationAddDlg::updateTypeConfigWidget );
+  connect( mFieldsMappingTable, &QTableWidget::itemSelectionChanged, this, &QgsRelationAddDlg::updateFieldsMappingButtons );
+  connect( mFieldsMappingAddButton, &QToolButton::clicked, this, &QgsRelationAddDlg::addFieldsRow );
+  connect( mFieldsMappingRemoveButton, &QToolButton::clicked, this, &QgsRelationAddDlg::removeFieldsRow );
+  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateDialogButtons );
+  connect( mReferencedLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateDialogButtons );
+  connect( mReferencedLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateReferencedFieldsComboBoxes );
+  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateChildRelationsComboBox );
+  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateReferencingFieldsComboBoxes );
 }
 
-void QgsRelationAddDlg::addFieldPairWidget()
+void QgsRelationAddDlg::updateTypeConfigWidget()
 {
-  int index = mFieldPairWidgets.count();
-  QgsFieldPairWidget *w = new QgsFieldPairWidget( index, this );
-  w->setReferencingLayer( mReferencingLayerCombobox->currentLayer() );
-  w->setReferencedLayer( mReferencedLayerCombobox->currentLayer() );
-  mFieldPairsLayout->addWidget( w );
-  mFieldPairWidgets << w;
-
-  connect( w, &QgsFieldPairWidget::configChanged, this, &QgsRelationAddDlg::checkDefinitionValid );
-  connect( w, &QgsFieldPairWidget::pairDisabled, this, [ = ]() {emit fieldPairRemoved( w );} );
-  connect( w, &QgsFieldPairWidget::pairEnabled, this, &QgsRelationAddDlg::addFieldPairWidget );
-  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, w, &QgsFieldPairWidget::setReferencingLayer );
-  connect( mReferencedLayerCombobox, &QgsMapLayerComboBox::layerChanged, w, &QgsFieldPairWidget::setReferencedLayer );
-}
-
-void QgsRelationAddDlg::fieldPairRemoved( QgsFieldPairWidget *fieldPairWidget )
-{
-  // remove widget only if not the first one, last one should always be disabled
-  int index = mFieldPairWidgets.indexOf( fieldPairWidget );
-  if ( index > 0 && index < mFieldPairWidgets.count() )
+  switch ( type() )
   {
-    mFieldPairWidgets.removeAt( index );
-    fieldPairWidget->deleteLater();
+    case QgsRelation::Normal:
+      mTypeStackedWidget->setCurrentWidget( mNormalTypeWidget );
+      mFieldsMappingTable->showColumn( 1 );
+      break;
+    case QgsRelation::Dynamic:
+      mTypeStackedWidget->setCurrentWidget( mDynamicTypeWidget );
+      mFieldsMappingTable->hideColumn( 1 );
+      updateChildRelationsComboBox();
+      break;
   }
+
+  updateDialogButtons();
+}
+
+QgsRelation::RelationType QgsRelationAddDlg::type()
+{
+  if ( mDynamicTypeRadioButton->isChecked() )
+    return QgsRelation::Dynamic;
+  else
+    return QgsRelation::Normal;
+}
+
+void QgsRelationAddDlg::addFieldsRow()
+{
+  QgsFieldComboBox *referencedField = new QgsFieldComboBox( this );
+  QgsFieldComboBox *referencingField = new QgsFieldComboBox( this );
+  int index = mFieldsMappingTable->rowCount();
+
+  referencedField->setLayer( mReferencedLayerCombobox->currentLayer() );
+  referencingField->setLayer( mReferencingLayerCombobox->currentLayer() );
+
+  mFieldsMappingTable->insertRow( index );
+  mFieldsMappingTable->setCellWidget( index, 0, referencedField );
+  mFieldsMappingTable->setCellWidget( index, 1, referencingField );
+
+  updateFieldsMappingButtons();
+  updateFieldsMappingHeaders();
+  updateDialogButtons();
+}
+
+void QgsRelationAddDlg::removeFieldsRow()
+{
+  if ( mFieldsMappingTable->selectionModel()->hasSelection() )
+  {
+    for ( const QModelIndex &index : mFieldsMappingTable->selectionModel()->selectedRows() )
+    {
+      if ( index.row() == 0 )
+        continue;
+
+      if ( mFieldsMappingTable->rowCount() > 2 )
+        mFieldsMappingTable->removeRow( index.row() );
+    }
+  }
+  else
+  {
+    mFieldsMappingTable->removeRow( mFieldsMappingTable->rowCount() - 1 );
+  }
+
+  updateFieldsMappingButtons();
+  updateFieldsMappingHeaders();
+  updateDialogButtons();
+}
+
+void QgsRelationAddDlg::updateFieldsMappingButtons()
+{
+  int rowsCount = mFieldsMappingTable->rowCount();
+  int selectedRowsCount = mFieldsMappingTable->selectionModel()->selectedRows().count();
+  bool isLayersRowSelected = mFieldsMappingTable->selectionModel()->isRowSelected( 0, QModelIndex() );
+  bool isRemoveButtonEnabled = !isLayersRowSelected && selectedRowsCount <= rowsCount - 2;
+
+  mFieldsMappingRemoveButton->setEnabled( isRemoveButtonEnabled );
+}
+
+void QgsRelationAddDlg::updateFieldsMappingHeaders()
+{
+  int rowsCount = mFieldsMappingTable->rowCount();
+  QStringList verticalHeaderLabels( {tr( "Layer" )} );
+
+  for ( int i = 0; i < rowsCount; i++ )
+    verticalHeaderLabels << tr( "Field %1" ).arg( i + 1 );
+
+  mFieldsMappingTable->setVerticalHeaderLabels( verticalHeaderLabels );
 }
 
 QString QgsRelationAddDlg::referencingLayerId()
@@ -244,16 +268,16 @@ QString QgsRelationAddDlg::referencedLayerId()
 
 QList< QPair< QString, QString > > QgsRelationAddDlg::references()
 {
-  QList< QPair< QString, QString > > references;
-  for ( int i = 0; i < mFieldPairWidgets.count(); i++ )
-  {
-    if ( !mFieldPairWidgets.at( i )->isPairEnabled() )
-      continue;
-    QString referencingField = mFieldPairWidgets.at( i )->referencingField();
-    QString referencedField = mFieldPairWidgets.at( i )->referencedField();
-    references << qMakePair( referencingField, referencedField );
-  }
-  return references;
+  // QList< QPair< QString, QString > > references;
+  // for ( int i = 0; i < mFieldPairWidgets.count(); i++ )
+  // {
+  //   if ( !mFieldPairWidgets.at( i )->isPairEnabled() )
+  //     continue;
+  //   QString referencingField = mFieldPairWidgets.at( i )->referencingField();
+  //   QString referencedField = mFieldPairWidgets.at( i )->referencedField();
+  //   references << qMakePair( referencingField, referencedField );
+  // }
+  // return references;
 }
 
 QString QgsRelationAddDlg::relationId()
@@ -268,17 +292,86 @@ QString QgsRelationAddDlg::relationName()
 
 QgsRelation::RelationStrength QgsRelationAddDlg::relationStrength()
 {
-  return mStrengthCombobox->currentData().value<QgsRelation::RelationStrength>();
+  return mRelationStrengthComboBox->currentData().value<QgsRelation::RelationStrength>();
 }
 
-void QgsRelationAddDlg::checkDefinitionValid()
+void QgsRelationAddDlg::updateDialogButtons()
 {
-  bool valid = mReferencingLayerCombobox->currentLayer() && mReferencedLayerCombobox->currentLayer();
-  for ( const QgsFieldPairWidget *fieldPairWidget : qgis::as_const( mFieldPairWidgets ) )
+  mButtonBox->button( QDialogButtonBox::Ok )->setEnabled( isDefinitionValid() );
+}
+
+bool QgsRelationAddDlg::isDefinitionValid()
+{
+  bool isValid = true;
+  QgsMapLayer *referencedLayer = mReferencedLayerCombobox->currentLayer();
+  isValid &= referencedLayer && referencedLayer->isValid();
+
+  if ( type() == QgsRelation::Normal )
   {
-    if ( !fieldPairWidget->isPairEnabled() )
-      continue;
-    valid &= !fieldPairWidget->referencingField().isNull() && !fieldPairWidget->referencedField().isNull();
+    QgsMapLayer *referencingLayer = mReferencingLayerCombobox->currentLayer();
+    isValid &= referencingLayer && referencingLayer->isValid();
   }
-  mButtonBox->button( QDialogButtonBox::Ok )->setEnabled( valid );
+
+  for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
+  {
+    if ( i == 0 )
+      continue;
+
+    isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField().isNull();
+
+    if ( type() == QgsRelation::Normal )
+      isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField().isNull();
+  }
+
+  return isValid;
+}
+
+void QgsRelationAddDlg::updateChildRelationsComboBox()
+{
+  mChildRelationsComboBox->clear();
+
+  QgsVectorLayer *vl = static_cast<QgsVectorLayer *>( mReferencedLayerCombobox->currentLayer() );
+  if ( !vl || !vl->isValid() )
+    return;
+
+  const QList<QgsRelation> relations = QgsProject::instance()->relationManager()->referencedRelations( vl );
+  for ( const QgsRelation &relation : relations )
+  {
+    if ( !relation.isValid() || relation.type() == QgsRelation::Dynamic )
+      continue;
+
+    mChildRelationsComboBox->addItem( relation.name(), relation.id() );
+  }
+}
+
+void QgsRelationAddDlg::updateReferencedFieldsComboBoxes()
+{
+  QgsMapLayer *vl = mReferencedLayerCombobox->currentLayer();
+  if ( !vl || !vl->isValid() )
+    return;
+
+  for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
+  {
+    if ( i == 0 )
+      continue;
+
+    auto fieldComboBox = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) );
+    fieldComboBox->setLayer( vl );
+  }
+}
+
+void QgsRelationAddDlg::updateReferencingFieldsComboBoxes()
+{
+  QgsMapLayer *vl = mReferencingLayerCombobox->currentLayer();
+  if ( !vl || !vl->isValid() )
+    return;
+
+  for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
+  {
+    if ( i == 0 )
+      continue;
+
+    auto fieldComboBox = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) );
+    fieldComboBox->setLayer( vl );
+  }
 }

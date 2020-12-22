@@ -277,3 +277,14 @@ QList<QgsRelation> QgsRelationManager::discoverRelations( const QList<QgsRelatio
   }
   return result;
 }
+
+
+QMap<QString, QList<QgsRelation>> QgsRelationManager::dynamicRelations() const
+{
+  return QMap<QString, QList<QgsRelation>>();
+}
+
+QList<QgsRelation> QgsRelationManager::relationsInDynamicRelation( QString dynamicRelationId ) const
+{
+  return QList<QgsRelation>();
+}

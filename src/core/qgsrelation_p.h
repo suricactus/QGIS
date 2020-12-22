@@ -63,6 +63,15 @@ class QgsRelationPrivate : public QSharedData
     */
     QList< QgsRelation::FieldPair > mFieldPairs;
 
+    //! The expression which allows to retrieve the referenced (parent) layer
+    QString mReferencedLayerExpression;
+
+    //! A list of relation ids that are set as children
+    QStringList mChildRelationIds;
+
+    //! Relation type, either Normal or Dynamic
+    QgsRelation::RelationType mRelationType = QgsRelation::Normal;
+
     bool mValid = false;
 };
 
