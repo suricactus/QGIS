@@ -29,45 +29,8 @@ class QVBoxLayout;
 class QHBoxLayout;
 
 class QgsVectorLayer;
-class QgsMapLayerComboBox;
 class QgsFieldComboBox;
-
-/**
- * QgsFieldPairWidget is horizontal widget with a field pair and buttons to enable/disable it
- */
-class APP_EXPORT QgsFieldPairWidget : public QWidget
-{
-    Q_OBJECT
-  public:
-    explicit QgsFieldPairWidget( int index, QWidget *parent = nullptr );
-    QString referencingField() const;
-    QString referencedField() const;
-    bool isPairEnabled() const;
-
-  signals:
-    void configChanged();
-    void pairDisabled( int index );
-    void pairEnabled();
-
-  public slots:
-    void setReferencingLayer( QgsMapLayer *layer );
-    void setReferencedLayer( QgsMapLayer *layer );
-
-  private:
-    void updateWidgetVisibility();
-    void changeEnable();
-
-    int mIndex;
-    bool mEnabled;
-    QToolButton *mAddButton;
-    QToolButton *mRemoveButton;
-    QgsFieldComboBox *mReferencingFieldCombobox;
-    QgsFieldComboBox *mReferencedFieldCombobox;
-    QSpacerItem *mSpacerItem;
-    QHBoxLayout *mLayout;
-
-};
-
+class QgsMapLayerComboBox;
 
 /**
  * QgsRelationAddDlg allows configuring a new relation.
@@ -98,6 +61,7 @@ class APP_EXPORT QgsRelationAddDlg : public QDialog, private Ui::QgsRelationMana
     void updateChildRelationsComboBox();
     void updateReferencedFieldsComboBoxes();
     void updateReferencingFieldsComboBoxes();
+    void updateReferencedLayerFieldComboBox();
 
   private:
     bool isDefinitionValid();
@@ -111,6 +75,7 @@ class APP_EXPORT QgsRelationAddDlg : public QDialog, private Ui::QgsRelationMana
 //    QLineEdit *mIdLineEdit = nullptr;
 //    QLineEdit *mReferencedLayerExpressionLineEdit = nullptr;
 //    QComboBox *mStrengthCombobox = nullptr;
+    QgsFieldComboBox *mReferencedLayerFieldComboBox = nullptr;
     QgsMapLayerComboBox *mReferencedLayerCombobox = nullptr;
     QgsMapLayerComboBox *mReferencingLayerCombobox = nullptr;
 
