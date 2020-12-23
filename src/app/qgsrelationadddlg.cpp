@@ -127,7 +127,7 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
   , Ui::QgsRelationManagerAddDialogBase()
 {
   setupUi( this );
-  setWindowTitle( "Add New Relation" );
+  setWindowTitle( tr( "Add New Relation" ) );
 
   mReferencedLayerCombobox = new QgsMapLayerComboBox( this );
   mReferencedLayerCombobox->setFilters( QgsMapLayerProxyModel::VectorLayer );
@@ -139,7 +139,10 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
 
   mRelationStrengthComboBox->addItem( "Association", QVariant::fromValue( QgsRelation::RelationStrength::Association ) );
   mRelationStrengthComboBox->addItem( "Composition", QVariant::fromValue( QgsRelation::RelationStrength::Composition ) );
-  mRelationStrengthComboBox->setToolTip( QStringLiteral( "On composition, the child features will be duplicated too.\n"
+
+  mRelationStrengthComboBox->addItem( tr( "Association" ), QVariant::fromValue( QgsRelation::RelationStrength::Association ) );
+  mRelationStrengthComboBox->addItem( tr( "Composition" ), QVariant::fromValue( QgsRelation::RelationStrength::Composition ) );
+  mRelationStrengthComboBox->setToolTip( tr( "When composition is selected the child features will be duplicated too.\n"
                                          "Duplications are made by the feature duplication action.\n"
                                          "The default actions are activated in the Action section of the layer properties." ) );
 
