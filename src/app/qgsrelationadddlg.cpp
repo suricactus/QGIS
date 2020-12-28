@@ -46,12 +46,9 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
   mReferencedLayerCombobox->setFilters( QgsMapLayerProxyModel::VectorLayer );
   mFieldsMappingTable->setCellWidget( 0, 0, mReferencedLayerCombobox );
 
-  mReferencedLayerFieldComboBox = new QgsFieldComboBox( this );
-  mFieldsMappingTable->setCellWidget( 0, 1, mReferencedLayerFieldComboBox );
-
   mReferencingLayerCombobox = new QgsMapLayerComboBox( this );
   mReferencingLayerCombobox->setFilters( QgsMapLayerProxyModel::VectorLayer );
-  mFieldsMappingTable->setCellWidget( 0, 2, mReferencingLayerCombobox );
+  mFieldsMappingTable->setCellWidget( 0, 1, mReferencingLayerCombobox );
 
   mRelationStrengthComboBox->addItem( tr( "Association" ), QVariant::fromValue( QgsRelation::RelationStrength::Association ) );
   mRelationStrengthComboBox->addItem( tr( "Composition" ), QVariant::fromValue( QgsRelation::RelationStrength::Composition ) );
@@ -67,13 +64,9 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
     QgsHelp::openHelp( QStringLiteral( "working_with_vector/attribute_table.html#defining-1-n-relations" ) );
   } );
 
-
   addFieldsRow();
-  updateTypeConfigWidget();
   updateDialogButtons();
 
-  connect( mNormalTypeRadioButton, &QRadioButton::clicked, this, &QgsRelationAddDlg::updateTypeConfigWidget );
-  connect( mPolymorphicTypeRadioButton, &QRadioButton::clicked, this, &QgsRelationAddDlg::updateTypeConfigWidget );
   connect( mFieldsMappingTable, &QTableWidget::itemSelectionChanged, this, &QgsRelationAddDlg::updateFieldsMappingButtons );
   connect( mFieldsMappingAddButton, &QToolButton::clicked, this, &QgsRelationAddDlg::addFieldsRow );
   connect( mFieldsMappingRemoveButton, &QToolButton::clicked, this, &QgsRelationAddDlg::removeFieldsRow );
@@ -82,45 +75,12 @@ QgsRelationAddDlg::QgsRelationAddDlg( QWidget *parent )
   connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateDialogButtons );
   connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateChildRelationsComboBox );
   connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateReferencingFieldsComboBoxes );
-  connect( mReferencingLayerCombobox, &QgsMapLayerComboBox::layerChanged, this, &QgsRelationAddDlg::updateReferencedLayerFieldComboBox );
-}
-
-void QgsRelationAddDlg::updateTypeConfigWidget()
-{
-  switch ( type() )
-  {
-    case QgsRelation::Normal:
-      mFieldsMappingTable->showColumn( 0 );
-      mFieldsMappingTable->hideColumn( 1 );
-      mPolymorphicRelationHelpLabel->hide();
-      mParentExpressionLabel->hide();
-      mParentExpressionWidget->hide();
-      break;
-    case QgsRelation::Dynamic:
-      mFieldsMappingTable->hideColumn( 0 );
-      mFieldsMappingTable->showColumn( 1 );
-      mPolymorphicRelationHelpLabel->show();
-      mParentExpressionLabel->show();
-      mParentExpressionWidget->show();
-      break;
-  }
-
-  updateDialogButtons();
-}
-
-QgsRelation::RelationType QgsRelationAddDlg::type()
-{
-  if ( mPolymorphicTypeRadioButton->isChecked() )
-    return QgsRelation::Dynamic;
-  else
-    return QgsRelation::Normal;
 }
 
 void QgsRelationAddDlg::addFieldsRow()
 {
   QgsFieldComboBox *referencedField = new QgsFieldComboBox( this );
   QgsFieldComboBox *referencingField = new QgsFieldComboBox( this );
-  QLineEdit *referencedPolymorphicField = new QLineEdit( this );
   int index = mFieldsMappingTable->rowCount();
 
   referencedField->setLayer( mReferencedLayerCombobox->currentLayer() );
@@ -128,8 +88,10 @@ void QgsRelationAddDlg::addFieldsRow()
 
   mFieldsMappingTable->insertRow( index );
   mFieldsMappingTable->setCellWidget( index, 0, referencedField );
-  mFieldsMappingTable->setCellWidget( index, 1, referencedPolymorphicField );
-  mFieldsMappingTable->setCellWidget( index, 2, referencingField );
+  mFieldsMappingTable->setCellWidget( index, 1, referencingField );
+
+  connect( referencedField, &QgsFieldComboBox::fieldChanged, this, &QgsRelationAddDlg::updateDialogButtons );
+  connect( referencingField, &QgsFieldComboBox::fieldChanged, this, &QgsRelationAddDlg::updateDialogButtons );
 
   updateFieldsMappingButtons();
   updateFieldsMappingHeaders();
@@ -192,16 +154,19 @@ QString QgsRelationAddDlg::referencedLayerId()
 
 QList< QPair< QString, QString > > QgsRelationAddDlg::references()
 {
-  // QList< QPair< QString, QString > > references;
-  // for ( int i = 0; i < mFieldPairWidgets.count(); i++ )
-  // {
-  //   if ( !mFieldPairWidgets.at( i )->isPairEnabled() )
-  //     continue;
-  //   QString referencingField = mFieldPairWidgets.at( i )->referencingField();
-  //   QString referencedField = mFieldPairWidgets.at( i )->referencedField();
-  //   references << qMakePair( referencingField, referencedField );
-  // }
-  // return references;
+  QList< QPair< QString, QString > > references;
+  for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
+  {
+    // ignore the layers row
+    if ( i == 0 )
+      continue;
+
+    QString referencingField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField();
+    QString referencedField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField();
+    references << qMakePair( referencingField, referencedField );
+  }
+
+  return references;
 }
 
 QString QgsRelationAddDlg::relationId()
@@ -228,23 +193,23 @@ bool QgsRelationAddDlg::isDefinitionValid()
 {
   bool isValid = true;
   QgsMapLayer *referencedLayer = mReferencedLayerCombobox->currentLayer();
+  qDebug() << 1 << isValid;
   isValid &= referencedLayer && referencedLayer->isValid();
-
-  if ( type() == QgsRelation::Normal )
-  {
-    QgsMapLayer *referencingLayer = mReferencingLayerCombobox->currentLayer();
-    isValid &= referencingLayer && referencingLayer->isValid();
-  }
+  qDebug() << 2 << isValid;
+  QgsMapLayer *referencingLayer = mReferencingLayerCombobox->currentLayer();
+  isValid &= referencingLayer && referencingLayer->isValid();
+  qDebug() << 3 << isValid;
 
   for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
   {
+    // ignore the layers row
     if ( i == 0 )
       continue;
 
     isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField().isNull();
-
-    if ( type() == QgsRelation::Normal )
-      isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 2 ) )->currentField().isNull();
+    qDebug() << 4 << isValid << static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField();
+    isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField().isNull();
+    qDebug() << 5 << isValid << static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField();
   }
 
   return isValid;
@@ -269,8 +234,6 @@ void QgsRelationAddDlg::updateChildRelationsComboBox()
 
     relationIdsList << relationName();
   }
-
-//  return relationIdsList;
 }
 
 void QgsRelationAddDlg::updateReferencedFieldsComboBoxes()
@@ -281,6 +244,7 @@ void QgsRelationAddDlg::updateReferencedFieldsComboBoxes()
 
   for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
   {
+    // ignore the layers row
     if ( i == 0 )
       continue;
 
@@ -297,15 +261,11 @@ void QgsRelationAddDlg::updateReferencingFieldsComboBoxes()
 
   for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
   {
+    // ignore the layers row
     if ( i == 0 )
       continue;
 
-    auto fieldComboBox = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 2 ) );
+    auto fieldComboBox = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) );
     fieldComboBox->setLayer( vl );
   }
-}
-
-void QgsRelationAddDlg::updateReferencedLayerFieldComboBox()
-{
-  mReferencedLayerFieldComboBox->setLayer( mReferencingLayerCombobox->currentLayer() );
 }

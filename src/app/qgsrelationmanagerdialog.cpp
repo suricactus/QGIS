@@ -15,6 +15,7 @@
 
 #include "qgsdiscoverrelationsdialog.h"
 #include "qgsrelationadddlg.h"
+#include "qgsrelationaddpolymorphicdlg.h"
 #include "qgsrelationmanagerdialog.h"
 #include "qgsrelationmanager.h"
 #include "qgsvectorlayer.h"
@@ -26,10 +27,14 @@ QgsRelationManagerDialog::QgsRelationManagerDialog( QgsRelationManager *relation
 {
   setupUi( this );
   connect( mBtnAddRelation, &QPushButton::clicked, this, &QgsRelationManagerDialog::mBtnAddRelation_clicked );
+  connect( mActionAddPolymorphicRelation, &QAction::triggered, this, &QgsRelationManagerDialog::mActionAddPolymorphicRelation_triggered );
   connect( mBtnDiscoverRelations, &QPushButton::clicked, this, &QgsRelationManagerDialog::mBtnDiscoverRelations_clicked );
   connect( mBtnRemoveRelation, &QPushButton::clicked, this, &QgsRelationManagerDialog::mBtnRemoveRelation_clicked );
 
   mBtnRemoveRelation->setEnabled( false );
+  mBtnAddRelation->setPopupMode( QToolButton::MenuButtonPopup );
+  mBtnAddRelation->addAction( mActionAddPolymorphicRelation );
+
   connect( mRelationsTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsRelationManagerDialog::onSelectionChanged );
 }
 
@@ -145,6 +150,15 @@ void QgsRelationManagerDialog::mBtnAddRelation_clicked()
     relation.setStrength( addDlg.relationStrength() );
 
     addRelation( relation );
+  }
+}
+
+void QgsRelationManagerDialog::mActionAddPolymorphicRelation_triggered()
+{
+  QgsRelationAddPolymorphicDlg addDlg;
+
+  if ( addDlg.exec() )
+  {
   }
 }
 

@@ -99,13 +99,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="mBtnAddRelation">
+      <widget class="QToolButton" name="mBtnAddRelation">
        <property name="text">
         <string>Add Relation</string>
        </property>
        <property name="icon">
         <iconset resource="../../images/images.qrc">
          <normaloff>:/images/themes/default/symbologyAdd.svg</normaloff>:/images/themes/default/symbologyAdd.svg</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -147,6 +150,14 @@
     </layout>
    </item>
   </layout>
+  <action name="mActionAddPolymorphicRelation">
+   <property name="text">
+    <string>Add Polymorphic Relation</string>
+   </property>
+   <property name="toolTip">
+    <string>Polymorphic relations are for advanced usage where a set of standard relations have the same referencing layer but the referenced layer is calculated from an expression.</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../../images/images.qrc"/>
