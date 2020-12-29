@@ -1,8 +1,8 @@
 /***************************************************************************
     qgspolymorphicrelation.h
      --------------------------------------
-    Date                 : Dec 2020
-    Copyright            : (C) 2013 Ivan Ivanov
+    Date                 : December 2020
+    Copyright            : (C) 2020 Ivan Ivanov
     Email                : ivan at opengis dot ch
  ***************************************************************************
  *                                                                         *

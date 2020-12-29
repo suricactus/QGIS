@@ -1,10 +1,9 @@
 /***************************************************************************
-  qgsrelationaddPolymorphicdlg.cpp - QgsRelationAddPolymorphicDlg
-  ---------------------------------
-
- begin                : 4.10.2013
- copyright            : (C) 2013 by Matthias Kuhn
- email                : matthias@opengis.ch
+    qgsrelationaddpolymorphicdlg.cpp
+    ---------------------
+    begin                : December 2020
+    copyright            : (C) 2020 by Ivan Ivanov
+    email                : ivan at opengis dot ch
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
