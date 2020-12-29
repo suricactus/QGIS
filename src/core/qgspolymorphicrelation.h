@@ -49,7 +49,7 @@ class CORE_EXPORT QgsPolymorphicRelation
     Q_PROPERTY( QgsVectorLayer *referencingLayer READ referencingLayer )
     Q_PROPERTY( QString referencedLayerField READ referencedLayerField )
     Q_PROPERTY( QString referencedLayerExpression READ referencedLayerExpression )
-    Q_PROPERTY( QString name READ name )
+    Q_PROPERTY( QString name READ name WRITE setName )
     Q_PROPERTY( bool isValid READ isValid )
 
   public:
@@ -102,6 +102,11 @@ class CORE_EXPORT QgsPolymorphicRelation
      * Set an id for this relation
      */
     void setId( const QString &id );
+
+    /**
+     * Set a name for this relation
+     */
+    void setName( const QString &name );
 
     /**
      * Set the referencing (child) layer id. This layer will be searched in the registry.

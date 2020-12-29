@@ -49,7 +49,10 @@ void QgsRelationManagerDialog::setLayers( const QList< QgsVectorLayer * > &layer
   const QList<QgsRelation> &relations = mRelationManager->relations().values();
   for ( const QgsRelation &rel : relations )
   {
-    addRelation( rel );
+    // the generated relations for polymorphic relations should be ignored,
+    // they are generated when the polymorphic relation is added to the table
+    if ( rel.polymorphicRelationId().isNull() )
+      addRelation( rel );
   }
   const QList<QgsPolymorphicRelation> &polymorphicRelations = mRelationManager->polymorphicRelations().values();
   for ( const QgsPolymorphicRelation &polymorphicRel : polymorphicRelations )
@@ -92,8 +95,6 @@ void QgsRelationManagerDialog::addRelation( const QgsRelation &rel )
     for ( int i = 0, l = mRelationsTree->topLevelItemCount(); i < l; i++ )
     {
       QTreeWidgetItem *parentItem = mRelationsTree->topLevelItem( i );
-
-      qDebug() <<  "name2" << parentItem->data( 0, Qt::UserRole ) << parentItem->data( 0, Qt::UserRole ).typeName();
 
       if ( parentItem->data( 0, Qt::UserRole ).typeName() != QStringLiteral( "QgsPolymorphicRelation" ) )
         continue;

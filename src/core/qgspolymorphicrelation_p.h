@@ -43,6 +43,8 @@ class QgsPolymorphicRelationPrivate : public QSharedData
 
     //! Unique Id
     QString mRelationId;
+    //! Human redable name
+    QString mRelationName;
     //! The child layer
     QString mReferencingLayerId;
     //! The child layer

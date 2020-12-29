@@ -63,42 +63,19 @@ QgsPolymorphicRelation QgsPolymorphicRelation::createFromXml( const QDomNode &no
   QString referencedLayerField = elem.attribute( QStringLiteral( "referencedLayerField" ) );
   QString referencedLayerExpression = elem.attribute( QStringLiteral( "referencedLayerExpression" ) );
   QString id = elem.attribute( QStringLiteral( "id" ) );
+  QString name = elem.attribute( QStringLiteral( "name" ) );
   // we UNsafely assume there are no "," is the relation ids
   const QStringList referencedLayerIds = elem.attribute( QStringLiteral( "referencedLayerIds" ) ).split( "," );
 
   QMap<QString, QgsMapLayer *> mapLayers = relationContext.project()->mapLayers();
 
-  QgsMapLayer *referencingLayer = mapLayers[referencingLayerId];
-
-  if ( !referencingLayer )
-  {
-    QgsLogger::warning( QApplication::translate( "QgsPolymorphicRelation", "Relation defined for layer '%1' which does not exist." ).arg( referencingLayerId ) );
-  }
-  else if ( QgsMapLayerType::VectorLayer  != referencingLayer->type() )
-  {
-    QgsLogger::warning( QApplication::translate( "QgsPolymorphicRelation", "Relation defined for layer '%1' which is not of type VectorLayer." ).arg( referencingLayerId ) );
-  }
-
-  for ( const QString &referencedLayerId : referencedLayerIds )
-  {
-    QgsMapLayer *referencedLayer = mapLayers[referencedLayerId];
-
-    if ( !referencedLayer )
-    {
-      QgsLogger::warning( QApplication::translate( "QgsPolymorphicRelation", "Relation defined for layer '%1' which does not exist." ).arg( referencedLayerId ) );
-    }
-    else if ( QgsMapLayerType::VectorLayer  != referencedLayer->type() )
-    {
-      QgsLogger::warning( QApplication::translate( "QgsPolymorphicRelation", "Relation defined for layer '%1' which is not of type VectorLayer." ).arg( referencedLayerId ) );
-    }
-  }
-
   relation.d->mReferencingLayerId = referencingLayerId;
-  relation.d->mReferencingLayer = qobject_cast<QgsVectorLayer *>( referencingLayer );
+  relation.d->mReferencingLayer = qobject_cast<QgsVectorLayer *>( mapLayers[referencingLayerId] );
   relation.d->mReferencedLayerField = referencedLayerField;
   relation.d->mReferencedLayerExpression = referencedLayerExpression;
   relation.d->mReferencedLayerIds = referencedLayerIds;
   relation.d->mRelationId = id;
+  relation.d->mRelationName = name;
 
   QDomNodeList references = elem.elementsByTagName( QStringLiteral( "fieldRef" ) );
   for ( int i = 0; i < references.size(); ++i )
@@ -120,6 +97,7 @@ void QgsPolymorphicRelation::writeXml( QDomNode &node, QDomDocument &doc ) const
 {
   QDomElement elem = doc.createElement( QStringLiteral( "relation" ) );
   elem.setAttribute( QStringLiteral( "id" ), d->mRelationId );
+  elem.setAttribute( QStringLiteral( "name" ), d->mRelationName );
   elem.setAttribute( QStringLiteral( "referencingLayer" ), d->mReferencingLayerId );
   elem.setAttribute( QStringLiteral( "referencedLayerField" ), d->mReferencedLayerField );
   elem.setAttribute( QStringLiteral( "referencedLayerExpression" ), d->mReferencedLayerExpression );
@@ -138,6 +116,9 @@ void QgsPolymorphicRelation::writeXml( QDomNode &node, QDomDocument &doc ) const
 
 void QgsPolymorphicRelation::setId( const QString &id )
 {
+  if ( d->mRelationId == id )
+    return;
+
   d.detach();
   d->mRelationId = id;
 
@@ -318,9 +299,23 @@ void QgsPolymorphicRelation::updateRelationStatus()
     }
   }
 }
+
+void QgsPolymorphicRelation::setName( const QString &name )
+{
+  if ( d->mRelationName == name && !name.isEmpty() )
+    return;
+
+  d.detach();
+  d->mRelationName = name;
+  updateRelationStatus();
+}
+
 QString QgsPolymorphicRelation::name() const
 {
-  return QObject::tr( "Polymorphic relations for \"%1\"" ).arg( d->mReferencingLayer ? d->mReferencingLayer->name() : QStringLiteral( "<NO LAYER>" ) );
+  if ( d->mRelationName.isEmpty() )
+    return QObject::tr( "Polymorphic relations for \"%1\"" ).arg( d->mReferencingLayer ? d->mReferencingLayer->name() : QStringLiteral( "<NO LAYER>" ) );
+
+  return d->mRelationName;
 }
 
 void QgsPolymorphicRelation::setReferencedLayerField( const QString &referencedLayerField )

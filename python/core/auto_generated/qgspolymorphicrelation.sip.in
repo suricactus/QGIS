@@ -69,6 +69,11 @@ Writes a relation to an XML structure. Used for saving .qgs projects
 Set an id for this relation
 %End
 
+    void setName( const QString &name );
+%Docstring
+Set a name for this relation
+%End
+
     void setReferencingLayer( const QString &id );
 %Docstring
 Set the referencing (child) layer id. This layer will be searched in the registry.

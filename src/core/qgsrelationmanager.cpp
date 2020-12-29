@@ -311,6 +311,11 @@ void QgsRelationManager::removePolymorphicRelation( const QString &polymorphicRe
 
 void QgsRelationManager::setPolymorphicRelations( const QList<QgsPolymorphicRelation> &relations )
 {
+  const QList<QgsPolymorphicRelation> oldRelations = polymorphicRelations().values();
+  for ( const QgsPolymorphicRelation &oldRelation : oldRelations )
+    removePolymorphicRelation( oldRelation.id() );
 
+  for ( const QgsPolymorphicRelation &newRelation : relations )
+    addPolymorphicRelation( newRelation );
 }
 
