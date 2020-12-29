@@ -50,7 +50,7 @@ QgsRelationAddPolymorphicDlg::QgsRelationAddPolymorphicDlg( QWidget *parent )
     QgsHelp::openHelp( QStringLiteral( "working_with_vector/attribute_table.html#defining-polymorphic-relations" ) );
   } );
 
-  const QMap<QString, QgsMapLayer *> layers = QgsProject::instance()->mapLayers( true );
+  const QVector<QgsVectorLayer *> layers = QgsProject::instance()->layers<QgsVectorLayer *>();
   for ( const QgsMapLayer *vl : layers )
   {
     if ( !vl || !vl->isValid() )

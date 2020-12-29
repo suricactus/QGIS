@@ -230,7 +230,6 @@ QgsAttributeList QgsPolymorphicRelation::referencingFields() const
 
 bool QgsPolymorphicRelation::isValid() const
 {
-  qDebug() << d->mValid << !d->mReferencingLayer.isNull() << !d->mReferencedLayerField.isNull() << d->mReferencingLayer.data()->isValid() << !d->mReferencedLayerExpression.isNull();
   return d->mValid && !d->mReferencingLayer.isNull() && !d->mReferencedLayerField.isNull() && d->mReferencingLayer.data()->isValid() && !d->mReferencedLayerExpression.isNull();
 }
 
@@ -360,6 +359,11 @@ QStringList QgsPolymorphicRelation::referencedLayerIds() const
   return d->mReferencedLayerIds;
 }
 
+QgsExpressionContext QgsPolymorphicRelation::getLayerContext() const
+{
+  return QgsExpressionContext();
+}
+
 QList<QgsRelation> QgsPolymorphicRelation::getGeneratedRelations() const
 {
   QList<QgsRelation> relations;
@@ -378,6 +382,7 @@ QList<QgsRelation> QgsPolymorphicRelation::getGeneratedRelations() const
     relation.setReferencingLayer( d->mReferencingLayerId );
     relation.setName( QStringLiteral( "Generated for \"%1\"" ).arg( referencedLayerName ) );
     relation.setId( QStringLiteral( "%1_%2" ).arg( d->mRelationId, referencedLayerName ) );
+    relation.setPolymorphicRelationId( d->mRelationId );
 
     for ( const QgsRelation::FieldPair &fieldPair : fieldPairs() )
       relation.addFieldPair( fieldPair );

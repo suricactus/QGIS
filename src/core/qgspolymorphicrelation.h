@@ -251,8 +251,8 @@ class CORE_EXPORT QgsPolymorphicRelation
     QgsExpressionContext getLayerContext() const;
 
 
-    void setChildRelationIds( const QStringList &childRelationIds );
-    QStringList childRelationIds() const;
+//    void setChildRelationIds( const QStringList &childRelationIds );
+//    QStringList childRelationIds() const;
     void setReferencedLayerIds( const QStringList &childRelationIds );
     QStringList referencedLayerIds() const;
 

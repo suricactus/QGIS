@@ -315,6 +315,13 @@ Will be called internally whenever a member is changed.
 .. versionadded:: 3.6
 %End
 
+    void setPolymorphicRelationId( const QString polymorphicRelationId );
+%Docstring
+Sets the parent polymorphic relation id.
+
+.. versionadded:: 3.18
+%End
+
     QString polymorphicRelationId() const;
 %Docstring
 Returns the parent polymorphic relation id. If the relation is a normal relation, a null string is returned.

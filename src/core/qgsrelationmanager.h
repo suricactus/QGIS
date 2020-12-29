@@ -23,6 +23,7 @@
 #include <QDomDocument>
 
 #include "qgsrelation.h"
+#include "qgspolymorphicrelation.h"
 
 class QgsProject;
 class QgsVectorLayer;
@@ -141,29 +142,28 @@ class CORE_EXPORT QgsRelationManager : public QObject
     /**
      * Returns all the polymorphic relations
      */
-    QMap<QString, QList<QgsRelation>> polymorphicRelations() const;
+    QMap<QString, QgsPolymorphicRelation> polymorphicRelations() const;
 
     /**
      * Returns the list of relations associated with a polymorphic relation
      */
-    QList<QgsRelation> polymorphicRelations( const QString &dynamicRelationId ) const;
+    QgsPolymorphicRelation polymorphicRelation( const QString &polymorphicRelationId ) const;
 
     /**
-     * Adds a new polymorphic relation
+     * Adds a new polymorphic relation. The generated relations are not available, they will be created automatically.
      */
-    void addPolymorphicRelation(
-      const QString &dynamicRelationId,
-      const QgsVectorLayer *referencingLayer,
-      const QString &layerField,
-      const QString &layerExpression,
-      const QList<QgsVectorLayer *> &layers
-    );
+    void addPolymorphicRelation( const QgsPolymorphicRelation &polymorphicRelation );
 
     /**
-     * Adds a new polymorphic relation
+     * Removes an existing polymorphic relation and it's generated relations.
      */
-    void removePolymorphicRelation( const QString &dynamicRelationId );
+    void removePolymorphicRelation( const QString &polymorphicRelationId );
 
+    /**
+     * Sets the specified polymorphic \a relations and removes any polymorphic relations currently set.
+     * Will remove any generated relations and recreate them.
+     */
+    void setPolymorphicRelations( const QList<QgsPolymorphicRelation> &relations );
 
   signals:
     //! Emitted when the relations were loaded after reading a project
@@ -190,6 +190,7 @@ class CORE_EXPORT QgsRelationManager : public QObject
   private:
     //! The references
     QMap<QString, QgsRelation> mRelations;
+    QMap<QString, QgsPolymorphicRelation> mPolymorphicRelations;
 
     QgsProject *mProject = nullptr;
 };

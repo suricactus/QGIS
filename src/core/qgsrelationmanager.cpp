@@ -278,29 +278,39 @@ QList<QgsRelation> QgsRelationManager::discoverRelations( const QList<QgsRelatio
   return result;
 }
 
-
-QMap<QString, QList<QgsRelation>> QgsRelationManager::polymorphicRelations() const
+QMap<QString, QgsPolymorphicRelation> QgsRelationManager::polymorphicRelations() const
 {
-  return QMap<QString, QList<QgsRelation>>();
+  return mPolymorphicRelations;
 }
 
-QList<QgsRelation> QgsRelationManager::polymorphicRelations( const QString &dynamicRelationId ) const
+QgsPolymorphicRelation QgsRelationManager::polymorphicRelation( const QString &polymorphicRelationId ) const
 {
-  return QList<QgsRelation>();
+  return mPolymorphicRelations.value( polymorphicRelationId );
 }
 
-void QgsRelationManager::addPolymorphicRelation(
-  const QString &dynamicRelationId,
-  const QgsVectorLayer *referencingLayer,
-  const QString &layerField,
-  const QString &layerExpression,
-  const QList<QgsVectorLayer *> &layers
-)
+void QgsRelationManager::addPolymorphicRelation( const QgsPolymorphicRelation &polymorphicRelation )
+{
+  if ( !polymorphicRelation.referencingLayer() || polymorphicRelation.id().isNull() )
+    return;
+
+  mPolymorphicRelations.insert( polymorphicRelation.id(), polymorphicRelation );
+
+  const QList<QgsRelation> generatedRelations = polymorphicRelation.getGeneratedRelations();
+  for ( const QgsRelation &generatedRelation : generatedRelations )
+    addRelation( generatedRelation );
+}
+
+void QgsRelationManager::removePolymorphicRelation( const QString &polymorphicRelationId )
+{
+  QgsPolymorphicRelation relation = mPolymorphicRelations.take( polymorphicRelationId );
+
+  const QList<QgsRelation> generatedRelations = relation.getGeneratedRelations();
+  for ( const QgsRelation &generatedRelation : generatedRelations )
+    removeRelation( generatedRelation.id() );
+}
+
+void QgsRelationManager::setPolymorphicRelations( const QList<QgsPolymorphicRelation> &relations )
 {
 
 }
 
-void QgsRelationManager::removePolymorphicRelation( const QString &dynamicRelationId )
-{
-
-}

@@ -38,6 +38,7 @@ class APP_EXPORT QgsRelationManagerDialog : public QWidget, private Ui::QgsRelat
     void addRelation( const QgsRelation &rel );
     void addPolymorphicRelation( const QgsPolymorphicRelation &relation );
     QList< QgsRelation > relations();
+    QList< QgsPolymorphicRelation > polymorphicRelations();
 
   private slots:
     void mBtnAddRelation_clicked();

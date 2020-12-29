@@ -401,8 +401,14 @@ void QgsRelation::updateRelationStatus()
   }
 }
 
+void QgsRelation::setPolymorphicRelationId( const QString polymorphicRelationId )
+{
+  d.detach();
+  d->mPolymorphicRelationId = polymorphicRelationId;
+}
+
 QString QgsRelation::polymorphicRelationId() const
 {
-  return QString();
+  return d->mPolymorphicRelationId;
 }
 
