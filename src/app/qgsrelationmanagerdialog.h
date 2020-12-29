@@ -21,6 +21,7 @@
 #include "qgis_app.h"
 
 class QgsRelation;
+class QgsPolymorphicRelation;
 class QgsRelationManager;
 class QgsRelationManagerTreeModel;
 class QgsVectorLayer;
@@ -35,6 +36,7 @@ class APP_EXPORT QgsRelationManagerDialog : public QWidget, private Ui::QgsRelat
     void setLayers( const QList<QgsVectorLayer *> & );
 
     void addRelation( const QgsRelation &rel );
+    void addPolymorphicRelation( const QgsPolymorphicRelation &relation );
     QList< QgsRelation > relations();
 
   private slots:
@@ -47,6 +49,7 @@ class APP_EXPORT QgsRelationManagerDialog : public QWidget, private Ui::QgsRelat
   private:
     QgsRelationManager *mRelationManager = nullptr;
     QList< QgsVectorLayer * > mLayers;
+    QString getUniqueId( const QString &idTmpl, const QString &ids ) const;
 };
 
 #endif // QGSRELATIONMANAGERDIALOG_H

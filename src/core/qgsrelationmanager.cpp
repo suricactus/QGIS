@@ -279,12 +279,28 @@ QList<QgsRelation> QgsRelationManager::discoverRelations( const QList<QgsRelatio
 }
 
 
-QMap<QString, QList<QgsRelation>> QgsRelationManager::dynamicRelations() const
+QMap<QString, QList<QgsRelation>> QgsRelationManager::polymorphicRelations() const
 {
   return QMap<QString, QList<QgsRelation>>();
 }
 
-QList<QgsRelation> QgsRelationManager::relationsInDynamicRelation( QString dynamicRelationId ) const
+QList<QgsRelation> QgsRelationManager::polymorphicRelations( const QString &dynamicRelationId ) const
 {
   return QList<QgsRelation>();
+}
+
+void QgsRelationManager::addPolymorphicRelation(
+  const QString &dynamicRelationId,
+  const QgsVectorLayer *referencingLayer,
+  const QString &layerField,
+  const QString &layerExpression,
+  const QList<QgsVectorLayer *> &layers
+)
+{
+
+}
+
+void QgsRelationManager::removePolymorphicRelation( const QString &dynamicRelationId )
+{
+
 }

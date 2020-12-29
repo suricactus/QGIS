@@ -139,14 +139,31 @@ class CORE_EXPORT QgsRelationManager : public QObject
     static QList<QgsRelation> discoverRelations( const QList<QgsRelation> &existingRelations, const QList<QgsVectorLayer *> &layers );
 
     /**
-     * Returns all the dynamic relations
+     * Returns all the polymorphic relations
      */
-    QMap<QString, QList<QgsRelation>> dynamicRelations() const;
+    QMap<QString, QList<QgsRelation>> polymorphicRelations() const;
 
     /**
-     * Returns the list of relations associated to a dynamic relation
+     * Returns the list of relations associated with a polymorphic relation
      */
-    QList<QgsRelation> relationsInDynamicRelation( QString dynamicRelationId ) const;
+    QList<QgsRelation> polymorphicRelations( const QString &dynamicRelationId ) const;
+
+    /**
+     * Adds a new polymorphic relation
+     */
+    void addPolymorphicRelation(
+      const QString &dynamicRelationId,
+      const QgsVectorLayer *referencingLayer,
+      const QString &layerField,
+      const QString &layerExpression,
+      const QList<QgsVectorLayer *> &layers
+    );
+
+    /**
+     * Adds a new polymorphic relation
+     */
+    void removePolymorphicRelation( const QString &dynamicRelationId );
+
 
   signals:
     //! Emitted when the relations were loaded after reading a project

@@ -130,15 +130,32 @@ Discover all the relations available from the current layers.
 .. versionadded:: 3.0
 %End
 
-    QMap<QString, QList<QgsRelation>> dynamicRelations() const;
+    QMap<QString, QList<QgsRelation>> polymorphicRelations() const;
 %Docstring
-Returns all the dynamic relations
+Returns all the polymorphic relations
 %End
 
-    QList<QgsRelation> relationsInDynamicRelation( QString dynamicRelationId ) const;
+    QList<QgsRelation> polymorphicRelations( const QString &dynamicRelationId ) const;
 %Docstring
-Returns the list of relations associated to a dynamic relation
+Returns the list of relations associated with a polymorphic relation
 %End
+
+    void addPolymorphicRelation(
+      const QString &dynamicRelationId,
+      const QgsVectorLayer *referencingLayer,
+      const QString &layerField,
+      const QString &layerExpression,
+      const QList<QgsVectorLayer *> &layers
+    );
+%Docstring
+Adds a new polymorphic relation
+%End
+
+    void removePolymorphicRelation( const QString &dynamicRelationId );
+%Docstring
+Adds a new polymorphic relation
+%End
+
 
   signals:
     void relationsLoaded();

@@ -45,9 +45,11 @@ class APP_EXPORT QgsRelationAddPolymorphicDlg : public QDialog, private Ui::QgsR
 
     QString referencingLayerId();
     QString referencedLayerField();
+    QString referencedLayerExpression();
     QList< QPair< QString, QString > > references();
     QString relationId();
     QString relationName();
+    QStringList referencedLayerIds();
     QgsRelation::RelationStrength relationStrength();
 
   private slots:

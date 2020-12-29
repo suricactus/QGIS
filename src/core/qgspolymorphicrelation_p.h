@@ -1,9 +1,9 @@
 /***************************************************************************
-               qgsrelation_p.h
+               qgspolymorphicrelation_p.h
                --------------------------
-    begin                : August 2018
-    copyright            : (C) 2018 Matthias Kuhn
-    email                : matthias@opengis.ch
+    begin                : Dec 2020
+    copyright            : (C) 2020 Ivan Ivanov
+    email                : ivan@opengis.ch
  ***************************************************************************/
 
 /***************************************************************************
@@ -14,8 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef QGSRELATION_P_H
-#define QGSRELATION_P_H
+#ifndef QGSPOLYMORPHICRELATION_P_H
+#define QGSPOLYMORPHICRELATION_P_H
 
 #define SIP_NO_FILE
 
@@ -30,30 +30,29 @@
 // version without notice, or even be removed.
 //
 
+#include "qgspolymorphicrelation.h"
 #include "qgsrelation.h"
 
 #include <QSharedData>
 #include <QPointer>
 
-class QgsRelationPrivate : public QSharedData
+class QgsPolymorphicRelationPrivate : public QSharedData
 {
   public:
-    QgsRelationPrivate() = default;
+    QgsPolymorphicRelationPrivate() = default;
 
     //! Unique Id
     QString mRelationId;
-    //! Human redable name
-    QString mRelationName;
     //! The child layer
     QString mReferencingLayerId;
     //! The child layer
     QPointer<QgsVectorLayer> mReferencingLayer;
-    //! The parent layer id
-    QString mReferencedLayerId;
-    //! The parent layer
-    QPointer<QgsVectorLayer> mReferencedLayer;
-
-    QgsRelation::RelationStrength mRelationStrength = QgsRelation::Association;
+    //! The field in the child layer that stores the parent layer
+    QString mReferencedLayerField;
+    //! The expression which allows to retrieve the referenced (parent) layer
+    QString mReferencedLayerExpression;
+    //! A list of layerids that are set as parents
+    QStringList mReferencedLayerIds;
 
     /**
      * A list of fields which define the relation.
@@ -63,9 +62,13 @@ class QgsRelationPrivate : public QSharedData
     */
     QList< QgsRelation::FieldPair > mFieldPairs;
 
+    //! A list of relation ids that are set as children
+    QStringList mGeneratedRelationIds;
+    QMap<QString, QgsVectorLayer *> mReferencedLayersMap;
+
     bool mValid = false;
 };
 
 /// @endcond
 
-#endif // QGSRELATION_P_H
+#endif // QGSPOLYMORPHICRELATION_P_H

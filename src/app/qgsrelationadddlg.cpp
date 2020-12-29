@@ -161,8 +161,8 @@ QList< QPair< QString, QString > > QgsRelationAddDlg::references()
     if ( i == 0 )
       continue;
 
-    QString referencingField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField();
-    QString referencedField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField();
+    QString referencedField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField();
+    QString referencingField = static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField();
     references << qMakePair( referencingField, referencedField );
   }
 
@@ -193,12 +193,9 @@ bool QgsRelationAddDlg::isDefinitionValid()
 {
   bool isValid = true;
   QgsMapLayer *referencedLayer = mReferencedLayerCombobox->currentLayer();
-  qDebug() << 1 << isValid;
   isValid &= referencedLayer && referencedLayer->isValid();
-  qDebug() << 2 << isValid;
   QgsMapLayer *referencingLayer = mReferencingLayerCombobox->currentLayer();
   isValid &= referencingLayer && referencingLayer->isValid();
-  qDebug() << 3 << isValid;
 
   for ( int i = 0, l = mFieldsMappingTable->rowCount(); i < l; i++ )
   {
@@ -207,9 +204,7 @@ bool QgsRelationAddDlg::isDefinitionValid()
       continue;
 
     isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField().isNull();
-    qDebug() << 4 << isValid << static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 0 ) )->currentField();
     isValid &= !static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField().isNull();
-    qDebug() << 5 << isValid << static_cast<QgsFieldComboBox *>( mFieldsMappingTable->cellWidget( i, 1 ) )->currentField();
   }
 
   return isValid;

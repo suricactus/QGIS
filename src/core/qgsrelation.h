@@ -48,7 +48,6 @@ class CORE_EXPORT QgsRelation
     Q_PROPERTY( QgsVectorLayer *referencedLayer READ referencedLayer )
     Q_PROPERTY( QString name READ name WRITE setName )
     Q_PROPERTY( bool isValid READ isValid )
-    Q_PROPERTY( RelationType type READ type )
 
   public:
 
@@ -62,17 +61,6 @@ class CORE_EXPORT QgsRelation
       Composition  //!< Fix relation, related elements are part of the parent and a parent copy will copy any children or delete of parent will delete children
     };
     Q_ENUM( RelationStrength )
-
-    /**
-     * enum for the relation type
-     * Normal, Dynamic
-     */
-    enum RelationType
-    {
-      Normal,   //!< The traditional relation 1:1, 1:n and m:n
-      Dynamic,  //!< The referencing layer is dynamic and calculated on the fly from the referenced (parent) layer. This allows single table to be used as parent for multiple other tables. A.k.a. document management.
-    };
-    Q_ENUM( RelationType )
 
 #ifndef SIP_RUN
 
@@ -395,42 +383,17 @@ class CORE_EXPORT QgsRelation
     void updateRelationStatus();
 
     /**
-      * Sets the \a expression which allows to retrieve the parent layer
-      * \since QGIS 3.18
-      */
-    void setReferencedLayerExpression( const QString &expression );
-
-    /**
-      * Returns the expression which allows to retrieve the parent layer
-      * \since QGIS 3.18
-      */
-    QString referencedLayerExpression() const;
-
-//    /**
-//      * Returns the list of fields used by the referencedLayerExpression
-//      * to retrieve parent layer
-//      * \since QGIS 3.18
-//      */
-//    QgsAttributeList layerReferencingFields() const;
-
-    /**
-     * Provide layer metadata as variables in an expression context
+     * Returns the parent polymorphic relation id. If the relation is a normal relation, a null string is returned.
      * \since QGIS 3.18
      */
-    QgsExpressionContext getLayerContext() const;
-
-
-    void setChildRelationIds( const QStringList &childRelationIds );
-    QStringList childRelationIds() const;
-    void setType( RelationType relationType );
-    RelationType type() const;
+    QString polymorphicRelationId() const;
 
   private:
 
     mutable QExplicitlySharedDataPointer<QgsRelationPrivate> d;
 
     QgsRelationContext mContext;
-    QString mReferencedLayerExpression;
+    QString mPolymorphicRelationId;
 };
 
 // Register QgsRelation for usage with QVariant
