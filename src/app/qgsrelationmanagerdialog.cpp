@@ -21,6 +21,28 @@
 #include "qgspolymorphicrelation.h"
 #include "qgsvectorlayer.h"
 
+
+#ifndef SIP_RUN
+class RelationNameEditorDelegate: public QStyledItemDelegate
+{
+  public:
+    RelationNameEditorDelegate( const QList<int> &editableColumns, QObject *parent = nullptr )
+      : QStyledItemDelegate( parent )
+      , mEditableColumns( editableColumns )
+    {}
+
+    virtual QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const
+    {
+      if ( mEditableColumns.contains( index.column() ) )
+        return QStyledItemDelegate::createEditor( parent, option, index );
+
+      return nullptr;
+    }
+  private:
+    QList<int> mEditableColumns;
+};
+#endif
+
 QgsRelationManagerDialog::QgsRelationManagerDialog( QgsRelationManager *relationMgr, QWidget *parent )
   : QWidget( parent )
   , Ui::QgsRelationManagerDialogBase()
@@ -29,6 +51,7 @@ QgsRelationManagerDialog::QgsRelationManagerDialog( QgsRelationManager *relation
   setupUi( this );
 
   mRelationsTree->header()->setSectionResizeMode( QHeaderView::ResizeToContents );
+  mRelationsTree->setItemDelegate( new RelationNameEditorDelegate( QList<int>( {0} ), this ) );
 
   connect( mBtnAddRelation, &QPushButton::clicked, this, &QgsRelationManagerDialog::mBtnAddRelation_clicked );
   connect( mActionAddPolymorphicRelation, &QAction::triggered, this, &QgsRelationManagerDialog::mActionAddPolymorphicRelation_triggered );
@@ -51,8 +74,10 @@ void QgsRelationManagerDialog::setLayers( const QList< QgsVectorLayer * > &layer
   {
     // the generated relations for polymorphic relations should be ignored,
     // they are generated when the polymorphic relation is added to the table
-    if ( rel.polymorphicRelationId().isNull() )
-      addRelation( rel );
+    if ( !rel.polymorphicRelationId().isEmpty() )
+      continue;
+
+    addRelation( rel );
   }
   const QList<QgsPolymorphicRelation> &polymorphicRelations = mRelationManager->polymorphicRelations().values();
   for ( const QgsPolymorphicRelation &polymorphicRel : polymorphicRelations )
@@ -111,7 +136,7 @@ void QgsRelationManagerDialog::addRelation( const QgsRelation &rel )
 
   // Save relation in first column's item
   item->setData( 0, Qt::UserRole, QVariant::fromValue<QgsRelation>( rel ) );
-  item->setFlags( Qt::ItemIsEnabled );
+  item->setFlags( item->flags() | Qt::ItemIsEditable );
 
   item->setText( 0, rel.name() );
   item->setText( 1, rel.referencedLayer()->name() );
@@ -154,7 +179,7 @@ void QgsRelationManagerDialog::addPolymorphicRelation( const QgsPolymorphicRelat
 
   // Save relation in first column's item
   item->setExpanded( true );
-  item->setFlags( Qt::ItemIsEnabled );
+  item->setFlags( item->flags() | Qt::ItemIsEditable );
   item->setData( 0, Qt::UserRole, QVariant::fromValue<QgsPolymorphicRelation>( relation ) );
   item->setText( 0, relation.name() );
   item->setText( 1, relation.referencingLayer()->name() );
@@ -164,7 +189,6 @@ void QgsRelationManagerDialog::addPolymorphicRelation( const QgsPolymorphicRelat
   item->setText( 5, relation.id() );
 
   const QList<QgsRelation> generatedRelations = relation.getGeneratedRelations();
-
   for ( const QgsRelation &generatedRelation : generatedRelations )
   {
     if ( !generatedRelation.isValid() )
@@ -306,7 +330,7 @@ QList< QgsPolymorphicRelation > QgsRelationManagerDialog::polymorphicRelations()
 
     QgsPolymorphicRelation relation = item->data( 0, Qt::UserRole ).value<QgsPolymorphicRelation>();
     // The name can be edited in the table, so apply this one
-//    relation.setName( item->data( 0, Qt::DisplayRole ).toString() );
+    relation.setName( item->data( 0, Qt::DisplayRole ).toString() );
     relations << relation;
   }
 
