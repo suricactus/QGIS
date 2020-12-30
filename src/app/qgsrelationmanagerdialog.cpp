@@ -83,12 +83,6 @@ void QgsRelationManagerDialog::setLayers( const QList< QgsVectorLayer * > &layer
   for ( const QgsPolymorphicRelation &polymorphicRel : polymorphicRelations )
   {
     addPolymorphicRelation( polymorphicRel );
-
-    const QList<QgsRelation> generatedRelations = polymorphicRel.getGeneratedRelations();
-    for ( const QgsRelation &generatedRelation : generatedRelations )
-    {
-      addRelation( generatedRelation );
-    }
   }
 
   mRelationsTree->sortByColumn( 0, Qt::AscendingOrder );
