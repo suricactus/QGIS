@@ -332,6 +332,7 @@ QVariant QgsEptPointCloudIndex::metadataStatistic( const QString &attribute, Qgs
     case QgsStatisticalSummary::FirstQuartile:
     case QgsStatisticalSummary::ThirdQuartile:
     case QgsStatisticalSummary::InterQuartileRange:
+    case QgsStatisticalSummary::Mode:
     case QgsStatisticalSummary::First:
     case QgsStatisticalSummary::Last:
     case QgsStatisticalSummary::All:

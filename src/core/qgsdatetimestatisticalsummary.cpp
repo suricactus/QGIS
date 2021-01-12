@@ -65,8 +65,7 @@ void QgsDateTimeStatisticalSummary::calculate( const QVariantList &values )
 {
   reset();
 
-  const auto constValues = values;
-  for ( const QVariant &variant : constValues )
+  for ( const QVariant &variant : values )
   {
     addValue( variant );
   }
@@ -121,7 +120,8 @@ void QgsDateTimeStatisticalSummary::finalize()
     {
       long long sumSecsSquared = 0;
 
-      for ( const QDateTime dt : mValues.keys() )
+      const QList<QDateTime> dts = mValues.keys();
+      for ( const QDateTime &dt : dts )
       {
         long long diff = mMean.secsTo( dt );
         // square and multiply by the times of occurrences
@@ -249,9 +249,10 @@ void QgsDateTimeStatisticalSummary::finalize()
   {
     int maxOccurrences = 0;
 
-    for ( const QDateTime key : mValues.keys() )
+    const QList<QDateTime> dts = mValues.keys();
+    for ( const QDateTime &dt : dts )
     {
-      int occurrences = mValues[key];
+      int occurrences = mValues[dt];
 
       if ( occurrences > maxOccurrences )
       {
@@ -263,7 +264,7 @@ void QgsDateTimeStatisticalSummary::finalize()
         continue;
       }
 
-      mMode.append( key );
+      mMode.append( dt );
     }
   }
 }
@@ -362,7 +363,7 @@ QVariant QgsDateTimeStatisticalSummary::statistic( QgsDateTimeStatisticalSummary
       if ( mIsTimes )
       {
         QList<QTime> modeTimeList;
-        for ( const QDateTime &dt : mMode )
+        for ( const QDateTime &dt : qgis::as_const( mMode ) )
         {
           modeTimeList.append( dt.time() );
         }
@@ -371,7 +372,7 @@ QVariant QgsDateTimeStatisticalSummary::statistic( QgsDateTimeStatisticalSummary
       }
       else
       {
-        return qgis::toVariantList( mMode );
+        return qgis::toVariantList( qgis::as_const( mMode ) );
       }
 
     }

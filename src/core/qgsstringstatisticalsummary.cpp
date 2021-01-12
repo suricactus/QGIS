@@ -51,8 +51,7 @@ void QgsStringStatisticalSummary::calculate( const QStringList &values )
 {
   reset();
 
-  const auto constValues = values;
-  for ( const QString &string : constValues )
+  for ( const QString &string : values )
   {
     testString( string );
   }
@@ -99,7 +98,8 @@ void QgsStringStatisticalSummary::finalize()
   {
     int maxOccurrences = 0;
 
-    for ( const QString key : mValues.keys() )
+    const QStringList keys = mValues.keys();
+    for ( const QString &key : keys )
     {
       int occurrences = mValues[key];
 
@@ -122,8 +122,7 @@ void QgsStringStatisticalSummary::calculateFromVariants( const QVariantList &val
 {
   reset();
 
-  const auto constValues = values;
-  for ( const QVariant &variant : constValues )
+  for ( const QVariant &variant : values )
   {
     if ( variant.isNull() )
     {
