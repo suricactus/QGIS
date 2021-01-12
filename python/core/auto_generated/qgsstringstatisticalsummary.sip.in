@@ -251,7 +251,7 @@ Returns the first value obtained.
 
 .. seealso:: :py:func:`last`
 
-.. versionadded:: 3.16
+.. versionadded:: 3.18
 %End
 
     QString last() const;
@@ -260,7 +260,7 @@ Returns the last value obtained.
 
 .. seealso:: :py:func:`first`
 
-.. versionadded:: 3.16
+.. versionadded:: 3.18
 %End
 
     QStringList mode() const;
@@ -269,7 +269,7 @@ Returns the mode of the values. The values are sorted alphabetically in ascendin
 
 .. seealso:: :py:func:`majority`
 
-.. versionadded:: 3.16
+.. versionadded:: 3.18
 %End
 
     static QString displayName( QgsStringStatisticalSummary::Statistic statistic );

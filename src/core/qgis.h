@@ -485,7 +485,7 @@ namespace qgis
    * \tparam T
    * \param list list to be converted
    * \return QVariantList
-   * \since 3.16
+   * \since 3.18
    */
   template<class T>
   QVariantList toVariantList( const QList<T> &list )

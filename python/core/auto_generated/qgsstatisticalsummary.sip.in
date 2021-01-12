@@ -322,7 +322,7 @@ be calculated.
 
 .. seealso:: :py:func:`majority`
 
-.. versionadded:: 3.16
+.. versionadded:: 3.18
 %End
 
     static QString displayName( QgsStatisticalSummary::Statistic statistic );

@@ -53,21 +53,21 @@ class CORE_EXPORT QgsDateTimeStatisticalSummary
       Count = 1 << 0,               //!< Count
       CountDistinct = 1 << 1,       //!< Number of distinct datetime values
       CountMissing = 1 << 2,        //!< Number of missing (null) values
-      Mean = 1 << 14,               //!< Mean of values (since QGIS 3.16)
-      Median = 1 << 15,             //!< Median of values (since QGIS 3.16)
-      StDev = 1 << 16,              //!< Standard deviation of values (since QGIS 3.16)
-      StDevSample = 1 << 17,        //!< Sample standard deviation of values (since QGIS 3.16)
+      Mean = 1 << 14,               //!< Mean of values (since QGIS 3.18)
+      Median = 1 << 15,             //!< Median of values (since QGIS 3.18)
+      StDev = 1 << 16,              //!< Standard deviation of values (since QGIS 3.18)
+      StDevSample = 1 << 17,        //!< Sample standard deviation of values (since QGIS 3.18)
       Min = 1 << 3,                 //!< Minimum (earliest) datetime value
       Max = 1 << 4,                 //!< Maximum (latest) datetime value
       Range = 1 << 5,               //!< Interval between earliest and latest datetime value
-      Minority = 1 << 6,            //!< Minority of values (since QGIS 3.16)
-      Majority = 1 << 7,            //!< Majority of values (since QGIS 3.16)
-      FirstQuartile = 1 << 18,      //!< First quartile (since QGIS 3.16)
-      ThirdQuartile = 1 << 19,      //!< Third quartile (since QGIS 3.16)
-      InterQuartileRange = 1 << 20, //!< Inter quartile range (IQR) (since QGIS 3.16)
-      First = 1 << 11,              //!< First value (since QGIS 3.16)
-      Last = 1 << 12,               //!< Last value (since QGIS 3.16)
-      Mode = 1 << 13,               //!< Mode value (since QGIS 3.16)
+      Minority = 1 << 6,            //!< Minority of values (since QGIS 3.18)
+      Majority = 1 << 7,            //!< Majority of values (since QGIS 3.18)
+      FirstQuartile = 1 << 18,      //!< First quartile (since QGIS 3.18)
+      ThirdQuartile = 1 << 19,      //!< Third quartile (since QGIS 3.18)
+      InterQuartileRange = 1 << 20, //!< Inter quartile range (IQR) (since QGIS 3.18)
+      First = 1 << 11,              //!< First value (since QGIS 3.18)
+      Last = 1 << 12,               //!< Last value (since QGIS 3.18)
+      Mode = 1 << 13,               //!< Mode value (since QGIS 3.18)
 
       All = Count | CountDistinct | CountMissing | Mean | Median | StDev | StDevSample | Min | Max | Range | FirstQuartile | ThirdQuartile | InterQuartileRange | Minority | Majority | First | Last | Mode, //!< All statistics
     };

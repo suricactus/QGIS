@@ -59,9 +59,9 @@ class CORE_EXPORT QgsStringStatisticalSummary
       MeanLength = 1 << 7,    //!< Mean length of strings
       Minority = 1 << 8,      //!< Minority of strings (since QGIS 3.14)
       Majority = 1 << 9,      //!< Majority of strings (since QGIS 3.14)
-      First = 1 << 10,        //!< First value (since QGIS 3.16)
-      Last = 1 << 11,         //!< Last value (since QGIS 3.16)
-      Mode = 1 << 12,         //!< Mode value (since QGIS 3.16)
+      First = 1 << 10,        //!< First value (since QGIS 3.18)
+      Last = 1 << 11,         //!< Last value (since QGIS 3.18)
+      Mode = 1 << 12,         //!< Mode value (since QGIS 3.18)
 
       All = Count | CountDistinct | CountMissing | Min | Max | MinimumLength | MaximumLength | MeanLength | Minority | Majority | First | Last | Mode, //!< All statistics
     };
@@ -227,7 +227,7 @@ class CORE_EXPORT QgsStringStatisticalSummary
      * Returns the first value obtained.
      *
      * \see last()
-     * \since QGIS 3.16
+     * \since QGIS 3.18
      */
     QString first() const { return mFirst; }
 
@@ -235,7 +235,7 @@ class CORE_EXPORT QgsStringStatisticalSummary
      * Returns the last value obtained.
      *
      * \see first()
-     * \since QGIS 3.16
+     * \since QGIS 3.18
      */
     QString last() const { return mLast; }
 
@@ -243,7 +243,7 @@ class CORE_EXPORT QgsStringStatisticalSummary
      * Returns the mode of the values. The values are sorted alphabetically in ascending order (this may change in future versions).
      *
      * \see majority()
-     * \since QGIS 3.16
+     * \since QGIS 3.18
      */
     QStringList mode() const { return mMode; }
 

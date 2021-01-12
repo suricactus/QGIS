@@ -65,7 +65,7 @@ class CORE_EXPORT QgsStatisticalSummary
       InterQuartileRange = 1 << 14, //!< Inter quartile range (IQR)
       First = 1 << 16, //!< First value (since QGIS 3.6)
       Last = 1 << 17, //!< Last value (since QGIS 3.6)
-      Mode = 1 << 18, //!< Last value (since QGIS 3.16)
+      Mode = 1 << 18, //!< Last value (since QGIS 3.18)
       All = Count | CountMissing | Sum | Mean | Median | StDev | Max | Min | Range | Minority | Majority | Variety | FirstQuartile | ThirdQuartile | InterQuartileRange | First | Last | Mode
     };
     Q_DECLARE_FLAGS( Statistics, Statistic )
@@ -290,7 +290,7 @@ class CORE_EXPORT QgsStatisticalSummary
      * Returns the inter mode statistic of the values.
      * be calculated.
      * \see majority
-     * \since 3.16
+     * \since 3.18
      */
     QList<double> mode() const { return mMode; }
 
