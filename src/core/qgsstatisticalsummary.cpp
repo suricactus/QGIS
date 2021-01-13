@@ -130,7 +130,7 @@ void QgsStatisticalSummary::finalize()
     mMajority = std::numeric_limits<double>::quiet_NaN();
     mFirstQuartile = std::numeric_limits<double>::quiet_NaN();
     mThirdQuartile = std::numeric_limits<double>::quiet_NaN();
-    mMode.empty();
+    mMode.clear();
     return;
   }
 
