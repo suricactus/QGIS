@@ -313,7 +313,7 @@ double QgsStatisticalSummary::statistic( QgsStatisticalSummary::Statistic stat )
     case Last:
       return mLast;
     case Mode:
-      // return NaN as we have to return a list of numbers, but the function retuns a single number
+      // return NaN as we have to return a list of numbers, but the function returns a single number
       // this statistic can be accessed only with explicit call of the `mode()` method
       return std::numeric_limits<double>::quiet_NaN();
     case All:
